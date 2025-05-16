@@ -1,0 +1,30 @@
+<?php
+class Database {
+    private $host = 'localhost';
+    private $dbname = 'metalvidros';
+    private $username = 'usuario_protegido';
+    private $password = 'senha_ultra_secreta';
+    private $conn;
+
+    public function __construct() {
+        try {
+            $this->conn = new PDO(
+                "mysql:host={$this->host};dbname={$this->dbname};charset=utf8",
+                $this->username,
+                $this->password,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                    PDO::ATTR_PERSISTENT => true
+                ]
+            );
+        } catch (PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            die("Erro de conexão com o banco de dados");
+        }
+    }
+
+    public function getConnection() {
+        return $this->conn;
+    }
+}

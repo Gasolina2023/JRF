@@ -1,0 +1,41 @@
+<?php
+// Configurações de segurança
+define('MAX_LOGIN_ATTEMPTS', 5);
+define('LOCKOUT_TIME', 300); // 5 minutos
+
+// Configurações do site
+define('SITE_NAME', 'Metal Vidros Admin');
+define('SITE_EMAIL', 'contato@metalvidros.com.br');
+
+// Timezone
+date_default_timezone_set('America/Sao_Paulo');
+
+// Auto-loader de classes
+spl_autoload_register(function ($class) {
+    require __DIR__ . '/class/' . $class . '.php';
+});
+
+// Inicia sessão segura
+function sec_session_start() {
+    $session_name = 'sec_session_id';
+    $secure = true;
+    $httponly = true;
+    
+    if (ini_set('session.use_only_cookies', 1) === FALSE) {
+        header("Location: ../error.php?err=Could not initiate a safe session (ini_set)");
+        exit();
+    }
+    
+    $cookieParams = session_get_cookie_params();
+    session_set_cookie_params(
+        $cookieParams["lifetime"],
+        $cookieParams["path"],
+        $cookieParams["domain"],
+        $secure,
+        $httponly
+    );
+    
+    session_name($session_name);
+    session_start();
+    session_regenerate_id(true);
+}

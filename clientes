@@ -1,0 +1,21 @@
+// admin/clientes.php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action'])) {
+        switch ($_POST['action']) {
+            case 'add':
+                // Validação e sanitização
+                $stmt = $conn->prepare("INSERT INTO clientes (...) VALUES (...)");
+                break;
+                
+            case 'edit':
+                // Atualização segura
+                $stmt = $conn->prepare("UPDATE clientes SET ... WHERE id = ?");
+                break;
+                
+            case 'delete':
+                // Deleção com confirmação
+                $stmt = $conn->prepare("DELETE FROM clientes WHERE id = ?");
+                break;
+        }
+    }
+}
