@@ -1,0 +1,70 @@
+<?php
+require_once '../config.php';
+require_once 'includes/auth.php';
+sec_session_start();
+
+$db = new Database();
+$conn = $db->getConnection();
+
+// Estatísticas
+$stats = [
+    'contatos' => $conn->query("SELECT COUNT(*) FROM contatos")->fetchColumn(),
+    'contatos_hoje' => $conn->query("SELECT COUNT(*) FROM contatos WHERE DATE(data_envio) = CURDATE()")->fetchColumn(),
+    'clientes' => $conn->query("SELECT COUNT(*) FROM clientes")->fetchColumn(),
+    'produtos' => $conn->query("SELECT COUNT(*) FROM produtos")->fetchColumn()
+];
+
+// Últimos contatos
+$stmt = $conn->query("SELECT * FROM contatos ORDER BY data_envio DESC LIMIT 5");
+$ultimos_contatos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+include 'includes/header.php';
+?>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Total Contatos</h5>
+                <h2><?= $stats['contatos'] ?></h2>
+            </div>
+        </div>
+    </div>
+    <!-- Repita para outras estatísticas -->
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h4>Últimos Contatos</h4>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Nome</th>
+                        <th>Assunto</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($ultimos_contatos as $contato): ?>
+                    <tr class="<?= $contato['lido'] ? '' : 'table-warning' ?>">
+                        <td><?= date('d/m H:i', strtotime($contato['data_envio'])) ?></td>
+                        <td><?= htmlspecialchars($contato['nome']) ?></td>
+                        <td><?= htmlspecialchars($contato['assunto']) ?></td>
+                        <td>
+                            <a href="contatos.php?action=view&id=<?= $contato['id'] ?>" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<?php include 'includes/footer.php'; ?>
